@@ -79,6 +79,7 @@
     <ResourceCompile Include="Direct X.rc">
       <Filter>Resource Files</Filter>
     </ResourceCompile>
+    <ResourceCompile Include="color.vs" />
   </ItemGroup>
   <ItemGroup>
     <Image Include="small.ico">
@@ -89,13 +90,6 @@
     </Image>
   </ItemGroup>
   <ItemGroup>
-    <None Include="color.ps">
-      <Filter>Resource Files</Filter>
-    </None>
-  </ItemGroup>
-  <ItemGroup>
-    <FxCompile Include="color.vs">
-      <Filter>Resource Files</Filter>
-    </FxCompile>
+    <FxCompile Include="color.ps" />
   </ItemGroup>
 </Project>
