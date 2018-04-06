@@ -54,6 +54,11 @@ public:
 
 	ID3D11ShaderResourceView* GetTexture();
 
+	//matrix
+	D3DXMATRIX world_matrix;
+	D3DXMATRIX translation_matrix;
+	D3DXMATRIX rotation_matrix;
+
 private:
 	bool InitializeBuffers(ID3D11Device*);
 	void ShutdownBuffers();
@@ -65,7 +70,8 @@ private:
 	bool LoadModel(char*);
 	void ReleaseModel();
 
-
+	float m_posX, m_posY, m_posZ;
+	float m_fPitch, m_fYaw, m_fRoll;
 private:
 	ID3D11Buffer * m_vertexBuffer, *m_indexBuffer;
 	int m_vertexCount, m_indexCount;

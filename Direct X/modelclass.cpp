@@ -9,6 +9,11 @@ ModelClass::ModelClass()
 	m_indexBuffer = 0;
 	m_Texture = 0;
 	m_model = 0;
+
+	m_posX = 0, m_posY = 0, m_posZ = 0;
+	m_fPitch = 0, m_fYaw = 0, m_fRoll = 0;
+
+	D3DXMatrixTranslation(&world_matrix, m_posX, m_posY, m_posZ);
 }
 
 
