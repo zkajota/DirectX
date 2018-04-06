@@ -21,7 +21,6 @@ SystemClass::~SystemClass()
 bool SystemClass::Initialize()
 {
 	int screenWidth, screenHeight;
-	bool result;
 
 
 	// Initialize the width and height of the screen to zero before sending the variables into the function.
@@ -31,16 +30,33 @@ bool SystemClass::Initialize()
 	// Initialize the windows api.
 	InitializeWindows(screenWidth, screenHeight);
 
+	if (InitalizeInput() == false)
+	{
+		return false;
+	}
+	if (InitalizeGraphics(screenWidth, screenHeight) == false)
+	{
+		return false;
+	}
+	return true;
+}
+
+bool SystemClass::InitalizeInput()
+{
 	// Create the input object.  This object will be used to handle reading the keyboard input from the user.
 	m_Input = new InputClass;
 	if (!m_Input)
 	{
 		return false;
 	}
-
 	// Initialize the input object.
 	m_Input->Initialize();
+	return true;
+}
 
+bool SystemClass::InitalizeGraphics(int _screenWidth, int _screenHeight)
+{
+	bool result;
 	// Create the graphics object.  This object will handle rendering all the graphics for this application.
 	m_Graphics = new GraphicsClass;
 	if (!m_Graphics)
@@ -49,12 +65,11 @@ bool SystemClass::Initialize()
 	}
 
 	// Initialize the graphics object.
-	result = m_Graphics->Initialize(screenWidth, screenHeight, m_hwnd);
+	result = m_Graphics->Initialize(_screenWidth, _screenHeight, m_hwnd);
 	if (!result)
 	{
 		return false;
 	}
-
 	return true;
 }
 

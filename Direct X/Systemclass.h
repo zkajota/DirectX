@@ -41,6 +41,8 @@ private:
 	bool Frame();
 	void InitializeWindows(int&, int&);
 	void ShutdownWindows();
+	bool InitalizeInput();
+	bool InitalizeGraphics(int _screenWidth, int _screenHeight);
 
 private:
 	LPCWSTR m_applicationName;
