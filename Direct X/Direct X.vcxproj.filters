@@ -48,6 +48,12 @@
     <ClInclude Include="cameraclass.h">
       <Filter>Header Files\Graphics</Filter>
     </ClInclude>
+    <ClInclude Include="textureclass.h">
+      <Filter>Header Files\Graphics</Filter>
+    </ClInclude>
+    <ClInclude Include="textureshaderclass.h">
+      <Filter>Header Files\Graphics</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="main.cpp">
@@ -74,12 +80,17 @@
     <ClCompile Include="cameraclass.cpp">
       <Filter>Source Files\Graphics</Filter>
     </ClCompile>
+    <ClCompile Include="textureclass.cpp">
+      <Filter>Source Files\Graphics</Filter>
+    </ClCompile>
+    <ClCompile Include="textureshaderclass.cpp">
+      <Filter>Source Files\Graphics</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ResourceCompile Include="Direct X.rc">
       <Filter>Resource Files</Filter>
     </ResourceCompile>
-    <ResourceCompile Include="color.vs" />
   </ItemGroup>
   <ItemGroup>
     <Image Include="small.ico">
@@ -90,6 +101,13 @@
     </Image>
   </ItemGroup>
   <ItemGroup>
-    <FxCompile Include="color.ps" />
+    <None Include="color.ps" />
+    <None Include="color.vs" />
+    <None Include="texture.vs">
+      <Filter>Header Files\Graphics</Filter>
+    </None>
+    <None Include="texture.ps">
+      <Filter>Header Files\Graphics</Filter>
+    </None>
   </ItemGroup>
 </Project>
