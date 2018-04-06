@@ -166,6 +166,8 @@
     <ClInclude Include="d3dclass.h" />
     <ClInclude Include="Graphicsclass.h" />
     <ClInclude Include="Inputclass.h" />
+    <ClInclude Include="lightclass.h" />
+    <ClInclude Include="lightshaderclass.h" />
     <ClInclude Include="modelclass.h" />
     <ClInclude Include="resource.h" />
     <ClInclude Include="Systemclass.h" />
@@ -179,6 +181,8 @@
     <ClCompile Include="d3dclass.cpp" />
     <ClCompile Include="Graphicsclass.cpp" />
     <ClCompile Include="Inputclass.cpp" />
+    <ClCompile Include="lightclass.cpp" />
+    <ClCompile Include="lightshaderclass.cpp" />
     <ClCompile Include="main.cpp" />
     <ClCompile Include="modelclass.cpp" />
     <ClCompile Include="Systemclasscpp.cpp" />
@@ -231,6 +235,8 @@
       <EntryPointName Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
       </EntryPointName>
     </None>
+    <None Include="light.ps" />
+    <None Include="light.vs" />
     <None Include="texture.ps" />
     <None Include="texture.vs" />
   </ItemGroup>

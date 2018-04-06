@@ -14,6 +14,8 @@
 #include "modelclass.h"
 #include "colorshaderclass.h"
 #include "textureshaderclass.h"
+#include "lightshaderclass.h"
+#include "lightclass.h"
 
 
 /////////////
@@ -39,7 +41,7 @@ public:
 	bool Frame();
 
 private:
-	bool Render();
+	bool Render(float);
 
 private:
 	D3DClass * m_D3D;
@@ -47,6 +49,8 @@ private:
 	ModelClass* m_Model;
 	ColorShaderClass* m_ColorShader;
 	TextureShaderClass* m_TextureShader;
+	LightShaderClass* m_LightShader;
+	LightClass* m_Light;
 };
 
 #endif
