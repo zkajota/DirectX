@@ -158,6 +158,11 @@ bool SystemClass::Frame()
 	return true;
 }
 
+void SystemClass::CheckInput()
+{
+
+}
+
 LRESULT CALLBACK SystemClass::MessageHandler(HWND hwnd, UINT umsg, WPARAM wparam, LPARAM lparam)
 {
 	switch (umsg)

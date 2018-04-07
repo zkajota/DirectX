@@ -11,7 +11,6 @@ LightShaderClass::LightShaderClass()
 	m_layout = 0;
 	m_sampleState = 0;
 	m_matrixBuffer = 0;
-
 	m_lightBuffer = 0;
 }
 

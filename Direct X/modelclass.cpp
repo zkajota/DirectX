@@ -70,6 +70,8 @@ void ModelClass::Shutdown()
 
 void ModelClass::Render(ID3D11DeviceContext* deviceContext)
 {
+	m_posX = m_posX + 0.01f;
+	D3DXMatrixTranslation(&world_matrix, m_posX, m_posY, m_posZ);
 	// Put the vertex and index buffers on the graphics pipeline to prepare them for drawing.
 	RenderBuffers(deviceContext);
 

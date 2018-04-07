@@ -43,6 +43,7 @@ private:
 	void ShutdownWindows();
 	bool InitalizeInput();
 	bool InitalizeGraphics(int _screenWidth, int _screenHeight);
+	void CheckInput();
 
 private:
 	LPCWSTR m_applicationName;
