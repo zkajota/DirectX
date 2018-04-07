@@ -37,6 +37,8 @@ public:
 	bool Initialize(int, int, HWND);
 	void Shutdown();
 	bool Frame();
+	void ZoomCamera(bool);
+	void MoveCamera(int _key);
 
 private:
 	bool Render(float);

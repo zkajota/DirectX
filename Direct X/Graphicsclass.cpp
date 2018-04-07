@@ -54,7 +54,7 @@ bool GraphicsClass::Initialize(int screenWidth, int screenHeight, HWND hwnd)
 
 	// Set the initial position of the camera.
 	//m_Camera->SetPosition(0.0f, 0.0f, -10.0f);
-	m_Camera->SetPosition(0.0f, 0.0f, -250.0f);
+	m_Camera->SetPosition(0.0f, 0.0f, -150.0f);
 
 	// Create the model object.
 	m_Model = new ModelClass;
@@ -182,8 +182,6 @@ bool GraphicsClass::Render(float rotation)
 	//D3DXMatrixRotationY(&cubeROT, D3DXToRadian(45.0f));
 	//D3DXMatrixTranslation(&worldMatrix, 10.0f, 2.0f, 1.0f);
 	//D3DXMatrixMultiply(&worldMatrix, &(cubeROT * cubeMOVE));
-
-
 	
 	// Clear the buffers to begin the scene.
 	m_D3D->BeginScene(0.0f, 0.0f, 0.0f, 1.0f);
@@ -214,5 +212,31 @@ bool GraphicsClass::Render(float rotation)
 	m_D3D->EndScene();
 
 	return true;
+}
 
+void GraphicsClass::ZoomCamera(bool zoomIn)
+{
+	m_Camera->Zoom(zoomIn);
+}
+
+void GraphicsClass::MoveCamera(int _key)
+{
+	D3DXVECTOR3 camPos = m_Camera->GetPosition();
+
+	switch (_key)
+	{
+	case 0x57:
+		m_Camera->SetPosition(camPos.x, camPos.y + 1.0f, camPos.z);
+		break;
+	case 0x53:
+		m_Camera->SetPosition(camPos.x, camPos.y - 1.0f, camPos.z);
+		break;
+	case 0x41:
+		m_Camera->SetPosition(camPos.x - 1.0f, camPos.y, camPos.z);
+		break;
+	case 0x44:
+		m_Camera->SetPosition(camPos.x + 1.0f, camPos.y, camPos.z);
+	default:
+		break;
+	}
 }

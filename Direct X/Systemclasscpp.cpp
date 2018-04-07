@@ -124,6 +124,7 @@ void SystemClass::Run()
 		else
 		{
 			// Otherwise do the frame processing.
+			CheckInput();
 			result = Frame();
 			if (!result)
 			{
@@ -160,6 +161,32 @@ bool SystemClass::Frame()
 
 void SystemClass::CheckInput()
 {
+
+	if (m_Input->IsKeyDown(0x45))
+	{
+		m_Graphics->ZoomCamera(true);
+	}
+	else if (m_Input->IsKeyDown(0x51))
+	{
+		m_Graphics->ZoomCamera(false);
+	}
+
+	if (m_Input->IsKeyDown(0x57))
+	{
+		m_Graphics->MoveCamera(0x57);
+	}
+	else if (m_Input->IsKeyDown(0x53))
+	{
+		m_Graphics->MoveCamera(0x53);
+	}
+	else if (m_Input->IsKeyDown(0x41))
+	{
+		m_Graphics->MoveCamera(0x41);
+	}
+	else if (m_Input->IsKeyDown(0x44))
+	{
+		m_Graphics->MoveCamera(0x44);
+	}
 
 }
 
