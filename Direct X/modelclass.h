@@ -55,10 +55,8 @@ public:
 
 	ID3D11ShaderResourceView* GetTexture();
 
-	//matrix
 	D3DXMATRIX world_matrix;
-	//D3DXMATRIX translation_matrix;
-	//D3DXMATRIX rotation_matrix;
+
 
 private:
 	bool InitializeBuffers(ID3D11Device*);
@@ -71,8 +69,6 @@ private:
 	bool LoadModel(char*);
 	void ReleaseModel();
 
-	//float m_posX, m_posY, m_posZ;
-	//float m_fPitch, m_fYaw, m_fRoll;
 	D3D11_BUFFER_DESC instanceBufferDesc;
 	D3D11_SUBRESOURCE_DATA instanceData;
 	ID3D11Device* my_device;

@@ -103,9 +103,12 @@ void ModelClass::Update()
 	//m_posX = m_posX + direction;
 	//D3DXMatrixTranslation(&world_matrix, m_posX, m_posY, m_posZ);
 	//D3DXMatrixTranslation(&world_matrix, 0.0f, 0.0f, 0.0f);
+	
+	D3DXVECTOR3 goal = D3DXVECTOR3(10,10,10);
+
 	for (int i = 0; i < agents.size(); ++i)
 	{
-		agents[i]->Update();
+		agents[i]->Update(&agents, &goal);
 		D3DXMatrixTranslation(&world_matrix, agents[i]->m_position.x, agents[i]->m_position.y, agents[i]->m_position.z);
 	}
 
@@ -228,8 +231,8 @@ bool ModelClass::InitializeBuffers(ID3D11Device* device)
 
 	for (int i = 0; i < m_instanceCount; i++)
 	{
-		float LO = -10.0f;
-		float HI = 10.0f;
+		float LO = -40.0f;
+		float HI = 40.0f;
 		float r3 = LO + static_cast <float> (rand()) / (static_cast <float> (RAND_MAX / (HI - LO)));
 		float r4 = LO + static_cast <float> (rand()) / (static_cast <float> (RAND_MAX / (HI - LO)));
 		instanceData_vector[i].position = D3DXVECTOR3(r3, r4, 0.0f);
@@ -238,6 +241,7 @@ bool ModelClass::InitializeBuffers(ID3D11Device* device)
 		agents.push_back(tomek);
 		tomek->m_position= D3DXVECTOR3(r3, r4, 0.0f);
 		tomek->myPositioninst = &instanceData_vector[i];
+		tomek->id = i;
 
 
 		LO = -0.02f;
