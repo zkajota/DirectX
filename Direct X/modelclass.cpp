@@ -2,7 +2,12 @@
 // Filename: modelclass.cpp
 ////////////////////////////////////////////////////////////////////////////////
 #include "modelclass.h"
+#include "GameObject.h"
 #include <random>
+#include <vector>
+#include <fstream>
+#include <time.h>
+using namespace std;
 
 ModelClass::ModelClass()
 {
@@ -11,11 +16,12 @@ ModelClass::ModelClass()
 	m_Texture = 0;
 	m_model = 0;
 	m_instanceBuffer = 0;
+	m_instanceCount = 10;
 
-	m_posX = 0, m_posY = 0, m_posZ = 0;
-	m_fPitch = 0, m_fYaw = 0, m_fRoll = 0;
+	//m_posX = 0, m_posY = 0, m_posZ = 0;
+	//m_fPitch = 0, m_fYaw = 0, m_fRoll = 0;
 
-	D3DXMatrixTranslation(&world_matrix, m_posX, m_posY, m_posZ);
+	//D3DXMatrixTranslation(&world_matrix, m_posX, m_posY, m_posZ);
 }
 
 
@@ -82,8 +88,32 @@ void ModelClass::Render(ID3D11DeviceContext* deviceContext)
 
 void ModelClass::Update()
 {
-	m_posX = m_posX + 0.01f;
-	D3DXMatrixTranslation(&world_matrix, m_posX, m_posY, m_posZ);
+	//float new_mPosX = -12.0f;
+	//float direction;
+
+	//if (m_posX < new_mPosX)
+	//{
+	//	direction = 0.1f;
+	//}
+	//else if (m_posX > new_mPosX)
+	//{
+	//	direction = -0.1f;
+	//}
+	//
+	//m_posX = m_posX + direction;
+	//D3DXMatrixTranslation(&world_matrix, m_posX, m_posY, m_posZ);
+	//D3DXMatrixTranslation(&world_matrix, 0.0f, 0.0f, 0.0f);
+	for (int i = 0; i < agents.size(); ++i)
+	{
+		agents[i]->Update();
+		D3DXMatrixTranslation(&world_matrix, agents[i]->m_position.x, agents[i]->m_position.y, agents[i]->m_position.z);
+	}
+
+}
+
+void ModelClass::Draw(DrawData * _DD)
+{
+
 }
 
 int ModelClass::GetVertexCount()
@@ -109,11 +139,13 @@ ID3D11ShaderResourceView* ModelClass::GetTexture()
 
 bool ModelClass::InitializeBuffers(ID3D11Device* device)
 {
+	my_device = device;
 	VertexType* vertices;
 	unsigned long* indices;
 	InstanceType* instances;
-	D3D11_BUFFER_DESC vertexBufferDesc, indexBufferDesc, instanceBufferDesc;
-	D3D11_SUBRESOURCE_DATA vertexData, indexData, instanceData;
+	
+	D3D11_BUFFER_DESC vertexBufferDesc, indexBufferDesc;
+	D3D11_SUBRESOURCE_DATA vertexData, indexData;
 	HRESULT result;
 	int i;
 	// Create the vertex array.
@@ -138,6 +170,8 @@ bool ModelClass::InitializeBuffers(ID3D11Device* device)
 
 		indices[i] = i;
 	}
+	
+	
 
 	// Set up the description of the static vertex buffer.
 	vertexBufferDesc.Usage = D3D11_USAGE_DEFAULT;
@@ -186,21 +220,33 @@ bool ModelClass::InitializeBuffers(ID3D11Device* device)
 	delete[] indices;
 	indices = 0;
 
-	m_instanceCount = 100000;
 
-	instances = new InstanceType[m_instanceCount];
-	if (!instances)
-	{
-		return false;
-	}
+	instanceData_vector.reserve(m_instanceCount);
+	instanceData_vector.resize(m_instanceCount);
+
+	srand(time(nullptr));
 
 	for (int i = 0; i < m_instanceCount; i++)
 	{
-		float LO = -200.0f;
-		float HI = 200.0f;
+		float LO = -10.0f;
+		float HI = 10.0f;
 		float r3 = LO + static_cast <float> (rand()) / (static_cast <float> (RAND_MAX / (HI - LO)));
 		float r4 = LO + static_cast <float> (rand()) / (static_cast <float> (RAND_MAX / (HI - LO)));
-		instances[i].position = D3DXVECTOR3(r3, r4, 0.0f);
+		instanceData_vector[i].position = D3DXVECTOR3(r3, r4, 0.0f);
+
+		Agent * tomek = new Agent;
+		agents.push_back(tomek);
+		tomek->m_position= D3DXVECTOR3(r3, r4, 0.0f);
+		tomek->myPositioninst = &instanceData_vector[i];
+
+
+		LO = -0.02f;
+		HI = 0.02f;
+		r3 = LO + static_cast <float> (rand()) / (static_cast <float> (RAND_MAX / (HI - LO)));
+		r4 = LO + static_cast <float> (rand()) / (static_cast <float> (RAND_MAX / (HI - LO)));
+		tomek->power = D3DXVECTOR3(r3, r4, 0.0f);
+
+		//generate random accelleration
 	}
 
 	// Set up the description of the instance buffer.
@@ -212,7 +258,7 @@ bool ModelClass::InitializeBuffers(ID3D11Device* device)
 	instanceBufferDesc.StructureByteStride = 0;
 
 	// Give the subresource structure a pointer to the instance data.
-	instanceData.pSysMem = instances;
+	instanceData.pSysMem = &instanceData_vector[0];
 	instanceData.SysMemPitch = 0;
 	instanceData.SysMemSlicePitch = 0;
 
@@ -224,9 +270,9 @@ bool ModelClass::InitializeBuffers(ID3D11Device* device)
 	}
 
 	// Release the instance array now that the instance buffer has been created and loaded.
-	delete[] instances;
-	instances = 0;
-
+	//delete[] instances;
+	//instances = 0;
+	
 	return true;
 }
 
@@ -237,6 +283,7 @@ void ModelClass::ShutdownBuffers()
 	// Release the instance buffer.
 	if (m_instanceBuffer)
 	{
+
 		m_instanceBuffer->Release();
 		m_instanceBuffer = 0;
 	}
@@ -261,6 +308,9 @@ void ModelClass::ShutdownBuffers()
 
 void ModelClass::RenderBuffers(ID3D11DeviceContext* deviceContext)
 {
+	m_instanceBuffer->Release();
+	my_device->CreateBuffer(&instanceBufferDesc, &instanceData, &m_instanceBuffer);
+
 	unsigned int strides[2];
 	unsigned int offsets[2];
 	ID3D11Buffer* bufferPointers[2];
@@ -393,4 +443,5 @@ void ModelClass::ReleaseTexture()
 
 	return;
 }
+
 

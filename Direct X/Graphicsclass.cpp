@@ -57,6 +57,7 @@ bool GraphicsClass::Initialize(int screenWidth, int screenHeight, HWND hwnd)
 
 	// Create the model object.
 	m_Model = new ModelClass;
+	//m_Model = new GameObject;
 	if (!m_Model)
 	{
 		return false;

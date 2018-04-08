@@ -3,34 +3,27 @@
 ////////////////////////////////////////////////////////////////////////////////
 #ifndef _MODELCLASS_H_
 #define _MODELCLASS_H_
-
-
-//////////////
-// INCLUDES //
-//////////////
 #include <d3d11.h>
 #include <d3dx10math.h>
-
 #include <fstream>
-using namespace std;
-
-///////////////////////
-// MY CLASS INCLUDES //
-///////////////////////
+#include <vector>
+#include "GameObject.h"
+#include "Agent.h"
 #include "textureclass.h"
 
-////////////////////////////////////////////////////////////////////////////////
-// Class name: ModelClass
-////////////////////////////////////////////////////////////////////////////////
-class ModelClass
+class Agent;
+
+struct InstanceType
 {
-private:
+	D3DXVECTOR3 position;
+};
 
-	struct InstanceType
-	{
-		D3DXVECTOR3 position;
-	};
 
+class ModelClass : public GameObject
+{
+public:
+
+	
 	struct VertexType
 	{
 		D3DXVECTOR3 position;
@@ -46,8 +39,6 @@ private:
 		float nx, ny, nz;
 	};
 
-
-public:
 	ModelClass();
 	ModelClass(const ModelClass&);
 	~ModelClass();
@@ -56,6 +47,7 @@ public:
 	void Shutdown();
 	void Render(ID3D11DeviceContext*);
 	void Update();
+	void Draw(DrawData* _DD) override;
 
 	int GetIndexCount();
 	int GetVertexCount();
@@ -65,8 +57,8 @@ public:
 
 	//matrix
 	D3DXMATRIX world_matrix;
-	D3DXMATRIX translation_matrix;
-	D3DXMATRIX rotation_matrix;
+	//D3DXMATRIX translation_matrix;
+	//D3DXMATRIX rotation_matrix;
 
 private:
 	bool InitializeBuffers(ID3D11Device*);
@@ -79,15 +71,20 @@ private:
 	bool LoadModel(char*);
 	void ReleaseModel();
 
-	float m_posX, m_posY, m_posZ;
-	float m_fPitch, m_fYaw, m_fRoll;
-private:
+	//float m_posX, m_posY, m_posZ;
+	//float m_fPitch, m_fYaw, m_fRoll;
+	D3D11_BUFFER_DESC instanceBufferDesc;
+	D3D11_SUBRESOURCE_DATA instanceData;
+	ID3D11Device* my_device;
 	ID3D11Buffer * m_vertexBuffer, *m_indexBuffer;
 	ID3D11Buffer* m_instanceBuffer;
 	int m_vertexCount, m_indexCount, m_instanceCount;
 
 	TextureClass* m_Texture;
 	ModelType* m_model; // reads and holds the model data, before its placed in vertex buffer
+
+	std::vector<InstanceType> instanceData_vector; // list of all isntances
+	std::vector<Agent*> agents;//list of pointers
 };
 
 #endif
