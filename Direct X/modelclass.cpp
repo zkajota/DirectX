@@ -2,6 +2,7 @@
 // Filename: modelclass.cpp
 ////////////////////////////////////////////////////////////////////////////////
 #include "modelclass.h"
+#include <random>
 
 ModelClass::ModelClass()
 {
@@ -9,6 +10,7 @@ ModelClass::ModelClass()
 	m_indexBuffer = 0;
 	m_Texture = 0;
 	m_model = 0;
+	m_instanceBuffer = 0;
 
 	m_posX = 0, m_posY = 0, m_posZ = 0;
 	m_fPitch = 0, m_fYaw = 0, m_fRoll = 0;
@@ -78,6 +80,16 @@ void ModelClass::Render(ID3D11DeviceContext* deviceContext)
 	return;
 }
 
+int ModelClass::GetVertexCount()
+{
+	return m_vertexCount;
+}
+
+int ModelClass::GetInstanceCount()
+{
+	return m_instanceCount;
+}
+
 int ModelClass::GetIndexCount()
 {
 	return m_indexCount;
@@ -93,8 +105,9 @@ bool ModelClass::InitializeBuffers(ID3D11Device* device)
 {
 	VertexType* vertices;
 	unsigned long* indices;
-	D3D11_BUFFER_DESC vertexBufferDesc, indexBufferDesc;
-	D3D11_SUBRESOURCE_DATA vertexData, indexData;
+	InstanceType* instances;
+	D3D11_BUFFER_DESC vertexBufferDesc, indexBufferDesc, instanceBufferDesc;
+	D3D11_SUBRESOURCE_DATA vertexData, indexData, instanceData;
 	HRESULT result;
 	int i;
 	// Create the vertex array.
@@ -167,6 +180,51 @@ bool ModelClass::InitializeBuffers(ID3D11Device* device)
 	delete[] indices;
 	indices = 0;
 
+	m_instanceCount = 100000;
+
+	instances = new InstanceType[m_instanceCount];
+	if (!instances)
+	{
+		return false;
+	}
+
+	for (int i = 0; i < m_instanceCount; i++)
+	{
+		float LO = -200.0f;
+		float HI = 200.0f;
+		float r3 = LO + static_cast <float> (rand()) / (static_cast <float> (RAND_MAX / (HI - LO)));
+		float r4 = LO + static_cast <float> (rand()) / (static_cast <float> (RAND_MAX / (HI - LO)));
+		instances[i].position = D3DXVECTOR3(r3, r4, 0.0f);
+	}
+	//instances[0].position = D3DXVECTOR3(-1.5f, -1.5f, 1.0f);
+	//instances[1].position = D3DXVECTOR3(-1.5f, 1.5f, 5.0f);
+	//instances[2].position = D3DXVECTOR3(1.5f, -1.5f, 5.0f);
+	//instances[3].position = D3DXVECTOR3(1.5f, 1.5f, 5.0f);
+
+	// Set up the description of the instance buffer.
+	instanceBufferDesc.Usage = D3D11_USAGE_DEFAULT;
+	instanceBufferDesc.ByteWidth = sizeof(InstanceType) * m_instanceCount;
+	instanceBufferDesc.BindFlags = D3D11_BIND_VERTEX_BUFFER;
+	instanceBufferDesc.CPUAccessFlags = 0;
+	instanceBufferDesc.MiscFlags = 0;
+	instanceBufferDesc.StructureByteStride = 0;
+
+	// Give the subresource structure a pointer to the instance data.
+	instanceData.pSysMem = instances;
+	instanceData.SysMemPitch = 0;
+	instanceData.SysMemSlicePitch = 0;
+
+	// Create the instance buffer.
+	result = device->CreateBuffer(&instanceBufferDesc, &instanceData, &m_instanceBuffer);
+	if (FAILED(result))
+	{
+		return false;
+	}
+
+	// Release the instance array now that the instance buffer has been created and loaded.
+	delete[] instances;
+	instances = 0;
+
 	return true;
 }
 
@@ -174,6 +232,13 @@ bool ModelClass::InitializeBuffers(ID3D11Device* device)
 
 void ModelClass::ShutdownBuffers()
 {
+	// Release the instance buffer.
+	if (m_instanceBuffer)
+	{
+		m_instanceBuffer->Release();
+		m_instanceBuffer = 0;
+	}
+
 	// Release the index buffer.
 	if (m_indexBuffer)
 	{
@@ -194,16 +259,24 @@ void ModelClass::ShutdownBuffers()
 
 void ModelClass::RenderBuffers(ID3D11DeviceContext* deviceContext)
 {
-	unsigned int stride;
-	unsigned int offset;
+	unsigned int strides[2];
+	unsigned int offsets[2];
+	ID3D11Buffer* bufferPointers[2];
 
+	// Set the buffer strides.
+	strides[0] = sizeof(VertexType);
+	strides[1] = sizeof(InstanceType);
 
-	// Set vertex buffer stride and offset.
-	stride = sizeof(VertexType);
-	offset = 0;
+	// Set the buffer offsets.
+	offsets[0] = 0;
+	offsets[1] = 0;
+
+	// Set the array of pointers to the vertex and instance buffers.
+	bufferPointers[0] = m_vertexBuffer;
+	bufferPointers[1] = m_instanceBuffer;
 
 	// Set the vertex buffer to active in the input assembler so it can be rendered.
-	deviceContext->IASetVertexBuffers(0, 1, &m_vertexBuffer, &stride, &offset);
+	deviceContext->IASetVertexBuffers(0, 2, bufferPointers, strides, offsets);
 
 	// Set the index buffer to active in the input assembler so it can be rendered.
 	deviceContext->IASetIndexBuffer(m_indexBuffer, DXGI_FORMAT_R32_UINT, 0);

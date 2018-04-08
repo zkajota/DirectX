@@ -25,6 +25,12 @@ using namespace std;
 class ModelClass
 {
 private:
+
+	struct InstanceType
+	{
+		D3DXVECTOR3 position;
+	};
+
 	struct VertexType
 	{
 		D3DXVECTOR3 position;
@@ -51,6 +57,8 @@ public:
 	void Render(ID3D11DeviceContext*);
 
 	int GetIndexCount();
+	int GetVertexCount();
+	int GetInstanceCount();
 
 	ID3D11ShaderResourceView* GetTexture();
 
@@ -74,7 +82,8 @@ private:
 	float m_fPitch, m_fYaw, m_fRoll;
 private:
 	ID3D11Buffer * m_vertexBuffer, *m_indexBuffer;
-	int m_vertexCount, m_indexCount;
+	ID3D11Buffer* m_instanceBuffer;
+	int m_vertexCount, m_indexCount, m_instanceCount;
 
 	TextureClass* m_Texture;
 	ModelType* m_model; // reads and holds the model data, before its placed in vertex buffer

@@ -2,7 +2,6 @@
 // Filename: light.vs
 ////////////////////////////////////////////////////////////////////////////////
 
-
 /////////////
 // GLOBALS //
 /////////////
@@ -21,7 +20,7 @@ struct VertexInputType
 {
     float4 position : POSITION;
     float2 tex : TEXCOORD0;
-    float3 normal : NORMAL;
+    float3 instancePosition : TEXCOORD1;
 };
 
 struct PixelInputType
@@ -43,6 +42,10 @@ PixelInputType LightVertexShader(VertexInputType input)
     // Change the position vector to be 4 units for proper matrix calculations.
     input.position.w = 1.0f;
 
+	// Update the position of the vertices based on the data for this particular instance.
+    input.position.x += input.instancePosition.x;
+    input.position.y += input.instancePosition.y;
+    input.position.z += input.instancePosition.z;
     // Calculate the position of the vertex against the world, view, and projection matrices.
     output.position = mul(input.position, worldMatrix);
     output.position = mul(output.position, viewMatrix);
@@ -52,10 +55,10 @@ PixelInputType LightVertexShader(VertexInputType input)
     output.tex = input.tex;
     
     // Calculate the normal vector against the world matrix only.
-    output.normal = mul(input.normal, (float3x3)worldMatrix);
+   // output.normal = mul(input.normal, (float3x3)worldMatrix);
 	
     // Normalize the normal vector.
-    output.normal = normalize(output.normal);
+    //output.normal = normalize(output.normal);
 
     return output;
 }

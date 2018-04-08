@@ -19,6 +19,9 @@
     <Filter Include="Source Files\Graphics">
       <UniqueIdentifier>{e6bbe48d-4d60-4147-8bae-9bb89508a783}</UniqueIdentifier>
     </Filter>
+    <Filter Include="GameObject">
+      <UniqueIdentifier>{65facd95-f006-486d-bcb8-1bc4d28fd951}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="targetver.h">
@@ -39,9 +42,6 @@
     <ClInclude Include="d3dclass.h">
       <Filter>Header Files\Graphics</Filter>
     </ClInclude>
-    <ClInclude Include="modelclass.h">
-      <Filter>Header Files\Graphics</Filter>
-    </ClInclude>
     <ClInclude Include="colorshaderclass.h">
       <Filter>Header Files</Filter>
     </ClInclude>
@@ -60,6 +60,9 @@
     <ClInclude Include="lightclass.h">
       <Filter>Header Files\Graphics</Filter>
     </ClInclude>
+    <ClInclude Include="modelclass.h">
+      <Filter>GameObject</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="main.cpp">
@@ -75,9 +78,6 @@
       <Filter>Source Files\Graphics</Filter>
     </ClCompile>
     <ClCompile Include="d3dclass.cpp">
-      <Filter>Source Files\Graphics</Filter>
-    </ClCompile>
-    <ClCompile Include="modelclass.cpp">
       <Filter>Source Files\Graphics</Filter>
     </ClCompile>
     <ClCompile Include="colorshaderclass.cpp">
@@ -97,6 +97,9 @@
     </ClCompile>
     <ClCompile Include="lightclass.cpp">
       <Filter>Source Files\Graphics</Filter>
+    </ClCompile>
+    <ClCompile Include="modelclass.cpp">
+      <Filter>GameObject</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -121,11 +124,7 @@
     <None Include="texture.ps">
       <Filter>Header Files\Graphics</Filter>
     </None>
-    <None Include="light.vs">
-      <Filter>Header Files\Graphics</Filter>
-    </None>
-    <None Include="light.ps">
-      <Filter>Header Files\Graphics</Filter>
-    </None>
+    <None Include="..\light.ps" />
+    <None Include="..\light.vs" />
   </ItemGroup>
 </Project>
