@@ -55,6 +55,7 @@ public:
 	bool Initialize(ID3D11Device*, char*, WCHAR*);
 	void Shutdown();
 	void Render(ID3D11DeviceContext*);
+	void Update();
 
 	int GetIndexCount();
 	int GetVertexCount();

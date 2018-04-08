@@ -76,8 +76,14 @@ void ModelClass::Render(ID3D11DeviceContext* deviceContext)
 	//D3DXMatrixTranslation(&world_matrix, m_posX, m_posY, m_posZ);
 	// Put the vertex and index buffers on the graphics pipeline to prepare them for drawing.
 	RenderBuffers(deviceContext);
-
+	Update();
 	return;
+}
+
+void ModelClass::Update()
+{
+	m_posX = m_posX + 0.01f;
+	D3DXMatrixTranslation(&world_matrix, m_posX, m_posY, m_posZ);
 }
 
 int ModelClass::GetVertexCount()
@@ -196,10 +202,6 @@ bool ModelClass::InitializeBuffers(ID3D11Device* device)
 		float r4 = LO + static_cast <float> (rand()) / (static_cast <float> (RAND_MAX / (HI - LO)));
 		instances[i].position = D3DXVECTOR3(r3, r4, 0.0f);
 	}
-	//instances[0].position = D3DXVECTOR3(-1.5f, -1.5f, 1.0f);
-	//instances[1].position = D3DXVECTOR3(-1.5f, 1.5f, 5.0f);
-	//instances[2].position = D3DXVECTOR3(1.5f, -1.5f, 5.0f);
-	//instances[3].position = D3DXVECTOR3(1.5f, 1.5f, 5.0f);
 
 	// Set up the description of the instance buffer.
 	instanceBufferDesc.Usage = D3D11_USAGE_DEFAULT;

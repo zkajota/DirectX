@@ -37,11 +37,12 @@ public:
 	bool Initialize(int, int, HWND);
 	void Shutdown();
 	bool Frame();
+	void Update();
 	void ZoomCamera(bool);
 	void MoveCamera(int _key);
 
 private:
-	bool Render(float);
+	bool Render();
 
 private:
 	D3DClass * m_D3D;
