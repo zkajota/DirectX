@@ -1,39 +1,22 @@
-////////////////////////////////////////////////////////////////////////////////
-// Filename: modelclass.cpp
-////////////////////////////////////////////////////////////////////////////////
-#include "modelclass.h"
-#include "GameObject.h"
-#include <random>
-#include <vector>
-#include <fstream>
-#include <time.h>
+#include "Level.h"
 
-using namespace std;
 
-ModelClass::ModelClass()
+
+Level::Level()
 {
-	m_vertexBuffer = 0;
-	m_indexBuffer = 0;
-	m_Texture = 0;
-	m_model = 0;
-	m_instanceBuffer = 0;
-	//m_instanceCount = 10;
-	goalL = 0.0f;
+	width = 0;
+	height = 0;
 }
 
 
-ModelClass::ModelClass(const ModelClass& other)
+Level::~Level()
 {
 }
 
-
-ModelClass::~ModelClass()
+bool Level::Initialize(ID3D11Device* device, char* modelFilename, WCHAR* textureFilename, int _instanceCount, int _width, int _height)
 {
-}
-
-bool ModelClass::Initialize(ID3D11Device* device, char* modelFilename, WCHAR* textureFilename, int _instanceCount, bool _isAgent)
-{
-	isAgent = _isAgent;
+	width = _width;
+	height = _height;
 	m_instanceCount = _instanceCount;
 	// = m_instanceCount;
 	bool result;
@@ -61,8 +44,7 @@ bool ModelClass::Initialize(ID3D11Device* device, char* modelFilename, WCHAR* te
 	return true;
 }
 
-
-void ModelClass::Shutdown()
+void Level::Shutdown()
 {
 	// Release the model data.
 	ReleaseModel();
@@ -70,11 +52,10 @@ void ModelClass::Shutdown()
 	ReleaseTexture();
 	// Release the vertex and index buffers.
 	ShutdownBuffers();
-
 	return;
 }
 
-void ModelClass::Render(ID3D11DeviceContext* deviceContext)
+void Level::Render(ID3D11DeviceContext* deviceContext)
 {
 	// Put the vertex and index buffers on the graphics pipeline to prepare them for drawing.
 	RenderBuffers(deviceContext);
@@ -82,73 +63,43 @@ void ModelClass::Render(ID3D11DeviceContext* deviceContext)
 	return;
 }
 
-void ModelClass::Update()
+void Level::Update()
 {
-	//update Agents
-	if (isAgent)
+	for (int i = 0; i < fields.size(); ++i)
 	{
-
-		D3DXVECTOR3 goal = D3DXVECTOR3(goalL, 0, 0);
-
-		for (int i = 0; i < agents.size(); ++i)
-		{
-			agents[i]->Update(&agents, &goal);
-			D3DXMatrixTranslation(&world_matrix, agents[i]->m_position.x, agents[i]->m_position.y, agents[i]->m_position.z);
-		}
-		//goalL++;
+		//fields[i]->Update();
+		D3DXMatrixTranslation(&world_matrix, fields[i]->m_position.x, fields[i]->m_position.y, fields[i]->m_position.z);
 	}
-	//else if (isAgent == false)
-	//{
-	//	for (int i = 0; i < fields.size(); ++i)
-	//	{
-	//		fields[i]->Update(&fields);
-	//		D3DXMatrixTranslation(&world_matrix, fields[i]->m_position.x, fields[i]->m_position.y, fields[i]->m_position.z);
-	//	}
-	//}
-	//else
-	//{
-	//	int x = 0;
-	//	int y = 0;
-	//	for (int i = 0; i < m_instanceCount; i++)
-	//	{
-	//		x++;
-	//		y++;
-	//	}
-	//}
+	// update vector field if new detected;
 }
 
-int ModelClass::GetVertexCount()
+int Level::GetVertexCount()
 {
 	return m_vertexCount;
 }
 
-int ModelClass::GetInstanceCount()
+int Level::GetInstanceCount()
 {
 	return m_instanceCount;
 }
 
-int ModelClass::GetIndexCount()
+int Level::GetIndexCount()
 {
 	return m_indexCount;
 }
 
-ID3D11ShaderResourceView* ModelClass::GetTexture()
+ID3D11ShaderResourceView* Level::GetTexture()
 {
 	return m_Texture->GetTexture();
 }
 
-void ModelClass::SetInstancePosition(D3DXVECTOR3 new_position)
-{
-	instanceData_vector[0].position = new_position;
-}
-
-bool ModelClass::InitializeBuffers(ID3D11Device* device)
+bool Level::InitializeBuffers(ID3D11Device* device)
 {
 	my_device = device;
 	VertexType* vertices;
 	unsigned long* indices;
-	InstanceType* instances;
-	
+	InstanceTypeLevel* instances;
+
 	D3D11_BUFFER_DESC vertexBufferDesc, indexBufferDesc;
 	D3D11_SUBRESOURCE_DATA vertexData, indexData;
 	HRESULT result;
@@ -227,79 +178,45 @@ bool ModelClass::InitializeBuffers(ID3D11Device* device)
 	instanceData_vector.reserve(m_instanceCount);
 	instanceData_vector.resize(m_instanceCount);
 
-	//if (isAgent == false)
+
+	//set up positions of tiles
+	//for (int i = 0; i < m_instanceCount; i++)
 	//{
-	//	//int rows = 10;
-	//	//int col = 10;
-
-	//	//float l = 0;
-	//	//float k = 0;
-	//	//int currentInst = 0;
-
-	//	//for (int i = 0; i < rows; i++)
-	//	//{
-	//	//	//posvector.x = posvector.x + 0.9f;
-	//	//	for (int j = 0; j < col; j++)
-	//	//	{
-	//	//		D3DXVECTOR3 newPosition = D3DXVECTOR3(l, k, 0.0f);
-	//	//		instanceData_vector[currentInst].position = newPosition;
-	//	//		//instanceData_vector[currentInst].position = posvector;
-	//	//		Field * field = new Field;
-	//	//		fields.push_back(field);
-	//	//		field->m_position = newPosition;
-	//	//		//field->m_position = posvector;
-	//	//		field->myPositioninst = &instanceData_vector[currentInst];
-	//	//		l += 3;
-	//	//		currentInst++;
-	//	//	}
-	//	//	l = 2;
-	//	//	k += 3;
-	//	//}
-
-	//	//for (int i = 0; i < m_instanceCount; i++)
-	//	//{
-	//	//		//D3DXVECTOR3 newPosition = D3DXVECTOR3(l, 0.0, 0.0f);
-	//	//		instanceData_vector[i].position = D3DXVECTOR3(0, 0, 0);
-	//	//		//instanceData_vector[currentInst].position = posvector;
-	//	//		Field * field = new Field;
-	//	//		fields.push_back(field);
-	//	//		field->m_position = D3DXVECTOR3(0, 0, 0);
-	//	//		field->myPositioninst = &instanceData_vector[currentInst];
-	//	//		//l++;
-	//	//		//currentInst++;
-	//	//		//goalL = goalL + 2.0f;
-	//	//}
+	//	//D3DXVECTOR3 newPosition = D3DXVECTOR3(l, 0.0, 0.0f);
+	//	instanceData_vector[i].position = D3DXVECTOR3(0, 0, 0);
+	//	//instanceData_vector[currentInst].position = posvector;
+	//	Field * field = new Field;
+	//	fields.push_back(field);
+	//	field->m_position = D3DXVECTOR3(0, 0, 0);
+	//	field->myPositioninst = &instanceData_vector[i];
 	//}
-	srand(time(nullptr));
-	if (isAgent == true)
+
+	//int width = 20;
+	//int height = 20;
+	int currentObject = 0;
+	for (int x = 0; x < width; x++)
 	{
-		for (int i = 0; i < m_instanceCount; i++)
+		for (int y = 0; y < height; y++)
 		{
-			float LO = -40.0f;
-			float HI = 40.0f;
-			float r3 = LO + static_cast <float> (rand()) / (static_cast <float> (RAND_MAX / (HI - LO)));
-			float r4 = LO + static_cast <float> (rand()) / (static_cast <float> (RAND_MAX / (HI - LO)));
-			instanceData_vector[i].position = D3DXVECTOR3(r3, r4, 0.0f);
+			//m_Cube = new ModelClass;
+			//result = m_Cube->Initialize(m_D3D->GetDevice(), model2, texture2, 1, false);
+			//m_Cube->SetInstancePosition(D3DXVECTOR3(x * 2, y * 2, 0));
+			//m_level.push_back(m_Cube);
 
-			Agent * tomek = new Agent;
-			agents.push_back(tomek);
-			tomek->m_position = D3DXVECTOR3(r3, r4, 0.0f);
-			tomek->myPositioninst = &instanceData_vector[i];
-			tomek->id = i;
-
-			LO = -0.02f;
-			HI = 0.02f;
-			r3 = LO + static_cast <float> (rand()) / (static_cast <float> (RAND_MAX / (HI - LO)));
-			r4 = LO + static_cast <float> (rand()) / (static_cast <float> (RAND_MAX / (HI - LO)));
-			tomek->power = D3DXVECTOR3(r3, r4, 0.0f);
-			//generate random accelleration
+			//instanceData_vector[currentObject].position = D3DXVECTOR3(0, 0, 0);
+			//instanceData_vector[currentInst].position = posvector;
+			Field * field = new Field;
+			fields.push_back(field);
+			//field->m_position = D3DXVECTOR3(0, 0, 0);
+			SetInstancePosition(D3DXVECTOR3(x * 2, y * 2, 0), currentObject);
+			field->myPositioninst = &instanceData_vector[currentObject];
+			currentObject++;
 		}
 	}
 
-
 	// Set up the description of the instance buffer.
 	instanceBufferDesc.Usage = D3D11_USAGE_DEFAULT;
-	instanceBufferDesc.ByteWidth = sizeof(InstanceType) * m_instanceCount;
+	instanceBufferDesc.ByteWidth = sizeof(InstanceTypeLevel) * m_instanceCount;
 	instanceBufferDesc.BindFlags = D3D11_BIND_VERTEX_BUFFER;
 	instanceBufferDesc.CPUAccessFlags = 0;
 	instanceBufferDesc.MiscFlags = 0;
@@ -316,13 +233,12 @@ bool ModelClass::InitializeBuffers(ID3D11Device* device)
 	{
 		return false;
 	}
-	
+
 	return true;
 }
 
 
-
-void ModelClass::ShutdownBuffers()
+void Level::ShutdownBuffers()
 {
 	// Release the instance buffer.
 	if (m_instanceBuffer)
@@ -349,10 +265,10 @@ void ModelClass::ShutdownBuffers()
 }
 
 
-void ModelClass::RenderBuffers(ID3D11DeviceContext* deviceContext)
+void Level::RenderBuffers(ID3D11DeviceContext* deviceContext)
 {
-	m_instanceBuffer->Release();
-	my_device->CreateBuffer(&instanceBufferDesc, &instanceData, &m_instanceBuffer);
+	/*m_instanceBuffer->Release();
+	my_device->CreateBuffer(&instanceBufferDesc, &instanceData, &m_instanceBuffer);*/
 
 	unsigned int strides[2];
 	unsigned int offsets[2];
@@ -360,7 +276,7 @@ void ModelClass::RenderBuffers(ID3D11DeviceContext* deviceContext)
 
 	// Set the buffer strides.
 	strides[0] = sizeof(VertexType);
-	strides[1] = sizeof(InstanceType);
+	strides[1] = sizeof(InstanceTypeLevel);
 
 	// Set the buffer offsets.
 	offsets[0] = 0;
@@ -382,7 +298,7 @@ void ModelClass::RenderBuffers(ID3D11DeviceContext* deviceContext)
 	return;
 }
 
-bool ModelClass::LoadTexture(ID3D11Device* device, WCHAR* filename)
+bool Level::LoadTexture(ID3D11Device* device, WCHAR* filename)
 {
 	bool result;
 
@@ -403,9 +319,9 @@ bool ModelClass::LoadTexture(ID3D11Device* device, WCHAR* filename)
 	return true;
 }
 
-bool ModelClass::LoadModel(char* filename)
+bool Level::LoadModel(char* filename)
 {
-	ifstream fin;
+	std::ifstream fin;
 	char input;
 	int i;
 
@@ -462,7 +378,7 @@ bool ModelClass::LoadModel(char* filename)
 	return true;
 }
 
-void ModelClass::ReleaseModel()
+void Level::ReleaseModel()
 {
 	if (m_model)
 	{
@@ -473,7 +389,7 @@ void ModelClass::ReleaseModel()
 	return;
 }
 
-void ModelClass::ReleaseTexture()
+void Level::ReleaseTexture()
 {
 	// Release the texture object.
 	if (m_Texture)
@@ -486,4 +402,21 @@ void ModelClass::ReleaseTexture()
 	return;
 }
 
-
+void Level::SetInstancePosition(D3DXVECTOR3 new_position, int i)
+{
+	//fields[i]->m_position = new_position;
+	instanceData_vector[i].position = new_position;
+}
+//
+//int width = 20;
+//int height = 20;
+//for (int x = 0; x < width; x++)
+//{
+//	for (int y = 0; y < height; y++)
+//	{
+//		m_Cube = new ModelClass;
+//		result = m_Cube->Initialize(m_D3D->GetDevice(), model2, texture2, 1, false);
+//		m_Cube->SetInstancePosition(D3DXVECTOR3(x * 2, y * 2, 0));
+//		m_level.push_back(m_Cube);
+//	}
+//}

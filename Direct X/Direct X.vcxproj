@@ -171,6 +171,7 @@
     <ClInclude Include="GeometryGenerator.h" />
     <ClInclude Include="Graphicsclass.h" />
     <ClInclude Include="Inputclass.h" />
+    <ClInclude Include="Level.h" />
     <ClInclude Include="lightclass.h" />
     <ClInclude Include="lightshaderclass.h" />
     <ClInclude Include="modelclass.h" />
@@ -191,6 +192,7 @@
     <ClCompile Include="GeometryGenerator.cpp" />
     <ClCompile Include="Graphicsclass.cpp" />
     <ClCompile Include="Inputclass.cpp" />
+    <ClCompile Include="Level.cpp" />
     <ClCompile Include="lightclass.cpp" />
     <ClCompile Include="lightshaderclass.cpp" />
     <ClCompile Include="main.cpp" />

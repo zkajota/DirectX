@@ -14,6 +14,7 @@ GraphicsClass::GraphicsClass()
 	m_Light = 0;
 	m_Cube = 0;
 	m_ColorShader = 0;
+	m_level = 0;
 }
 
 
@@ -49,6 +50,7 @@ bool GraphicsClass::Initialize(int screenWidth, int screenHeight, HWND hwnd)
 		return false;
 	}
 
+
 	// Create the camera object.
 	m_Camera = new CameraClass;
 	if (!m_Camera)
@@ -77,28 +79,39 @@ bool GraphicsClass::Initialize(int screenWidth, int screenHeight, HWND hwnd)
 		return false;
 	}
 	
+	m_level = new Level;
+	if (!m_level)
+	{
+		return false;
+	}
 	char model2[] = "../data/cube.txt";
 	WCHAR texture2[] = L"../data/seafloor.dds";
-	int width = 20;
-	int height = 20;
-	for (int x = 0; x < width; x++)
+	result = m_level->Initialize(m_D3D->GetDevice(), model, texture, 1600, 40, 40);
+	if (!result)
 	{
-		for (int y = 0; y < height; y++)
-		{
-			m_Cube = new ModelClass;
-			result = m_Cube->Initialize(m_D3D->GetDevice(), model2, texture2, 1, false);
-			m_Cube->SetInstancePosition(D3DXVECTOR3(x*2, y*2, 0));
-			m_level.push_back(m_Cube);
-		}
+		MessageBox(hwnd, L"znowu cos spierdolilem.", L"Error", MB_OK);
+		return false;
 	}
+ 	//int width = 20;
+	//int height = 20;
+	//for (int x = 0; x < width; x++)
+	//{
+	//	for (int y = 0; y < height; y++)
+	//	{
+	//		m_Cube = new ModelClass;
+	//		result = m_Cube->Initialize(m_D3D->GetDevice(), model2, texture2, 1, false);
+	//		m_Cube->SetInstancePosition(D3DXVECTOR3(x*2, y*2, 0));
+	//		m_level.push_back(m_Cube);
+	//	}
+	//}
 	/*m_Cube = new ModelClass;
 	result = m_Cube->Initialize(m_D3D->GetDevice(), model2, texture2, 1, false);
 	m_Cube->SetInstancePosition(D3DXVECTOR3(1, 1, 0));*/
-	if (!result)
-	{
-		MessageBox(hwnd, L"Could not initialize the m_Cube.", L"Error", MB_OK);
-		return false;
-	}
+	//if (!result)
+	//{
+	//	MessageBox(hwnd, L"Could not initialize the m_Cube.", L"Error", MB_OK);
+	//	return false;
+	//}
 
 	// Create the light shader object.
 	m_LightShader = new LightShaderClass;
@@ -197,6 +210,12 @@ void GraphicsClass::Shutdown()
 		delete m_ColorShader;
 		m_ColorShader = 0;
 	}
+	if (m_level)
+	{
+		m_level->Shutdown();
+		delete m_level;
+		m_level = 0;
+	}
 	return;
 }
 
@@ -250,20 +269,27 @@ bool GraphicsClass::Render()
 
 
 	 //Put the model vertex and index buffers on the graphics pipeline to prepare them for drawing.
-
-	for(auto tile :m_level)
-	{
-		tile->Render(m_D3D->GetDeviceContext());
-		result = m_LightShader->Render(m_D3D->GetDeviceContext(), tile->GetIndexCount(), tile->GetVertexCount(), tile->GetInstanceCount(), tile->world_matrix, viewMatrix, projectionMatrix, tile->GetTexture(), m_Light->GetDirection(), m_Light->GetAmbientColor(), m_Light->GetDiffuseColor());
-		if (!result)
-		{
-			return false;
-		}
-	}
+	//m_D3D->GetDeviceContext()
+	//for(auto tile :m_level)
+	//{
+	//	tile->Render(m_D3D->GetDeviceContext());
+	//	result = m_LightShader->Render(m_D3D->GetDeviceContext(), tile->GetIndexCount(), tile->GetVertexCount(), tile->GetInstanceCount(), tile->world_matrix, viewMatrix, projectionMatrix, tile->GetTexture(), m_Light->GetDirection(), m_Light->GetAmbientColor(), m_Light->GetDiffuseColor());
+	//	if (!result)
+	//	{
+	//		return false;
+	//	}
+	//}
 	
 
 	m_Model->Render(m_D3D->GetDeviceContext());
 	result = m_LightShader->Render(m_D3D->GetDeviceContext(), m_Model->GetIndexCount(), m_Model->GetVertexCount(), m_Model->GetInstanceCount(), m_Model->world_matrix, viewMatrix, projectionMatrix, m_Model->GetTexture(), m_Light->GetDirection(), m_Light->GetAmbientColor(), m_Light->GetDiffuseColor());
+	if (!result)
+	{
+		return false;
+	}
+
+	m_level->Render(m_D3D->GetDeviceContext());
+	result = m_LightShader->Render(m_D3D->GetDeviceContext(), m_level->GetIndexCount(), m_level->GetVertexCount(), m_level->GetInstanceCount(), m_level->world_matrix, viewMatrix, projectionMatrix, m_level->GetTexture(), m_Light->GetDirection(), m_Light->GetAmbientColor(), m_Light->GetDiffuseColor());
 	if (!result)
 	{
 		return false;

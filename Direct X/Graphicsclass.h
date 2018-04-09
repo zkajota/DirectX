@@ -13,8 +13,7 @@
 #include "modelclass.h"
 #include "lightshaderclass.h"
 #include "lightclass.h"
-#include "GameObject.h"
-#include "Cube.h"
+#include "Level.h"
 #include "colorshaderclass.h"
 
 
@@ -55,7 +54,8 @@ private:
 	ColorShaderClass* m_ColorShader;
 	LightClass* m_Light;
 	ModelClass* m_Cube;
-	std::vector<ModelClass*> m_level;
+	Level* m_level;
+	//std::vector<ModelClass*> m_level;
 };
 
 #endif
