@@ -17,11 +17,6 @@ ModelClass::ModelClass()
 	m_model = 0;
 	m_instanceBuffer = 0;
 	m_instanceCount = 10;
-
-	//m_posX = 0, m_posY = 0, m_posZ = 0;
-	//m_fPitch = 0, m_fYaw = 0, m_fRoll = 0;
-
-	//D3DXMatrixTranslation(&world_matrix, m_posX, m_posY, m_posZ);
 }
 
 
@@ -66,10 +61,8 @@ void ModelClass::Shutdown()
 {
 	// Release the model data.
 	ReleaseModel();
-
 	// Release the model texture.
 	ReleaseTexture();
-
 	// Release the vertex and index buffers.
 	ShutdownBuffers();
 
@@ -78,8 +71,6 @@ void ModelClass::Shutdown()
 
 void ModelClass::Render(ID3D11DeviceContext* deviceContext)
 {
-	//m_posX = m_posX + 0.01f;
-	//D3DXMatrixTranslation(&world_matrix, m_posX, m_posY, m_posZ);
 	// Put the vertex and index buffers on the graphics pipeline to prepare them for drawing.
 	RenderBuffers(deviceContext);
 	Update();
@@ -88,21 +79,6 @@ void ModelClass::Render(ID3D11DeviceContext* deviceContext)
 
 void ModelClass::Update()
 {
-	//float new_mPosX = -12.0f;
-	//float direction;
-
-	//if (m_posX < new_mPosX)
-	//{
-	//	direction = 0.1f;
-	//}
-	//else if (m_posX > new_mPosX)
-	//{
-	//	direction = -0.1f;
-	//}
-	//
-	//m_posX = m_posX + direction;
-	//D3DXMatrixTranslation(&world_matrix, m_posX, m_posY, m_posZ);
-	//D3DXMatrixTranslation(&world_matrix, 0.0f, 0.0f, 0.0f);
 	
 	D3DXVECTOR3 goal = D3DXVECTOR3(10,10,10);
 
@@ -111,12 +87,6 @@ void ModelClass::Update()
 		agents[i]->Update(&agents, &goal);
 		D3DXMatrixTranslation(&world_matrix, agents[i]->m_position.x, agents[i]->m_position.y, agents[i]->m_position.z);
 	}
-
-}
-
-void ModelClass::Draw(DrawData * _DD)
-{
-
 }
 
 int ModelClass::GetVertexCount()
@@ -243,13 +213,11 @@ bool ModelClass::InitializeBuffers(ID3D11Device* device)
 		tomek->myPositioninst = &instanceData_vector[i];
 		tomek->id = i;
 
-
 		LO = -0.02f;
 		HI = 0.02f;
 		r3 = LO + static_cast <float> (rand()) / (static_cast <float> (RAND_MAX / (HI - LO)));
 		r4 = LO + static_cast <float> (rand()) / (static_cast <float> (RAND_MAX / (HI - LO)));
 		tomek->power = D3DXVECTOR3(r3, r4, 0.0f);
-
 		//generate random accelleration
 	}
 
@@ -272,10 +240,6 @@ bool ModelClass::InitializeBuffers(ID3D11Device* device)
 	{
 		return false;
 	}
-
-	// Release the instance array now that the instance buffer has been created and loaded.
-	//delete[] instances;
-	//instances = 0;
 	
 	return true;
 }
@@ -287,7 +251,6 @@ void ModelClass::ShutdownBuffers()
 	// Release the instance buffer.
 	if (m_instanceBuffer)
 	{
-
 		m_instanceBuffer->Release();
 		m_instanceBuffer = 0;
 	}
@@ -346,7 +309,6 @@ void ModelClass::RenderBuffers(ID3D11DeviceContext* deviceContext)
 bool ModelClass::LoadTexture(ID3D11Device* device, WCHAR* filename)
 {
 	bool result;
-
 
 	// Create the texture object.
 	m_Texture = new TextureClass;

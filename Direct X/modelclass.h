@@ -19,7 +19,7 @@ struct InstanceType
 };
 
 
-class ModelClass : public GameObject
+class ModelClass
 {
 public:
 
@@ -29,7 +29,6 @@ public:
 		D3DXVECTOR3 position;
 		D3DXVECTOR2 texture;
 		D3DXVECTOR3 normal;
-
 	};
 
 	struct ModelType
@@ -47,7 +46,6 @@ public:
 	void Shutdown();
 	void Render(ID3D11DeviceContext*);
 	void Update();
-	void Draw(DrawData* _DD) override;
 
 	int GetIndexCount();
 	int GetVertexCount();

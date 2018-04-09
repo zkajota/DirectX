@@ -14,6 +14,8 @@
 #include "lightshaderclass.h"
 #include "lightclass.h"
 #include "GameObject.h"
+#include "Cube.h"
+#include "colorshaderclass.h"
 
 
 /////////////
@@ -50,7 +52,9 @@ private:
 	CameraClass* m_Camera;
 	ModelClass* m_Model;
 	LightShaderClass* m_LightShader;
+	ColorShaderClass* m_ColorShader;
 	LightClass* m_Light;
+	Cube* m_Cube;
 };
 
 #endif

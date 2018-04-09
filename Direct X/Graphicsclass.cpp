@@ -12,16 +12,20 @@ GraphicsClass::GraphicsClass()
 	m_Model = 0;
 	m_LightShader = 0;
 	m_Light = 0;
+	m_Cube = 0;
+	m_ColorShader = 0;
 }
 
 
 GraphicsClass::GraphicsClass(const GraphicsClass& other)
 {
+
 }
 
 
 GraphicsClass::~GraphicsClass()
 {
+
 }
 
 
@@ -64,12 +68,20 @@ bool GraphicsClass::Initialize(int screenWidth, int screenHeight, HWND hwnd)
 	}
 
 	// Initialize the model object.
-	WCHAR texture[] = L"../data/seafloor.dds";
+	WCHAR texture[] = L"../data/tileFloor.dds";
 	char model[] = "../data/cube.txt";
 	result = m_Model->Initialize(m_D3D->GetDevice(), model, texture);
 	if (!result)
 	{
 		MessageBox(hwnd, L"Could not initialize the model object.", L"Error", MB_OK);
+		return false;
+	}
+
+	m_Cube = new Cube;
+	result = m_Cube->Initialise(m_D3D->GetDevice());
+	if (!result)
+	{
+		MessageBox(hwnd, L"Could not initialize the m_Cube.", L"Error", MB_OK);
 		return false;
 	}
 
@@ -92,6 +104,19 @@ bool GraphicsClass::Initialize(int screenWidth, int screenHeight, HWND hwnd)
 	m_Light = new LightClass;
 	if (!m_Light)
 	{
+		return false;
+	}
+
+	m_ColorShader = new ColorShaderClass;
+	if (!m_ColorShader)
+	{
+		return false;
+	}
+
+	result = m_ColorShader->Initialize(m_D3D->GetDevice(), hwnd);
+	if (!result)
+	{
+		MessageBox(hwnd, L"Could not initialize the m_ColorShader.", L"Error", MB_OK);
 		return false;
 	}
 
@@ -144,6 +169,19 @@ void GraphicsClass::Shutdown()
 		delete m_D3D;
 		m_D3D = 0;
 	}
+
+	if (m_Cube)
+	{
+		m_Cube->Shutdown();
+		delete m_Cube;
+		m_Cube = 0;
+	}
+	if (m_ColorShader)
+	{
+		m_ColorShader->Shutdown();
+		delete m_ColorShader;
+		m_ColorShader = 0;
+	}
 	return;
 }
 
@@ -173,6 +211,7 @@ bool GraphicsClass::Render()
 {
 	D3DXMATRIX viewMatrix, projectionMatrix, worldMatrix;
 	bool result;
+	bool cube;
 
 	D3DXMATRIX cubeROT, cubeMOVE;
 
@@ -195,8 +234,15 @@ bool GraphicsClass::Render()
 	//D3DXMatrixRotationY(&worldMatrix, rotation);
 
 	// Put the model vertex and index buffers on the graphics pipeline to prepare them for drawing.
-	m_Model->Render(m_D3D->GetDeviceContext());
 
+	m_Cube->Render(m_D3D->GetDeviceContext());
+	result = m_ColorShader->Render(m_D3D->GetDeviceContext(), m_Cube->GetIndexCount(), worldMatrix, viewMatrix, projectionMatrix);
+	if (!result)
+	{
+		return false;
+	}
+
+	m_Model->Render(m_D3D->GetDeviceContext());
 	// Render the model using the light shader.
 	result = m_LightShader->Render(m_D3D->GetDeviceContext(), m_Model->GetIndexCount(), m_Model->GetVertexCount(), m_Model->GetInstanceCount(), m_Model->world_matrix, viewMatrix, projectionMatrix, m_Model->GetTexture(), m_Light->GetDirection(), m_Light->GetAmbientColor(), m_Light->GetDiffuseColor());
 	if (!result)
