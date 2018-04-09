@@ -9,9 +9,11 @@
 #include <vector>
 #include "GameObject.h"
 #include "Agent.h"
+#include "Field.h"
 #include "textureclass.h"
 
 class Agent;
+class Field;
 
 struct InstanceType
 {
@@ -23,7 +25,7 @@ class ModelClass
 {
 public:
 
-	
+	float goalL;
 	struct VertexType
 	{
 		D3DXVECTOR3 position;
@@ -42,7 +44,10 @@ public:
 	ModelClass(const ModelClass&);
 	~ModelClass();
 
-	bool Initialize(ID3D11Device*, char*, WCHAR*);
+	int xx = 0;
+	int yy = 0;
+
+	bool Initialize(ID3D11Device*, char*, WCHAR*, int _numOfInstances, bool _isAgent);
 	void Shutdown();
 	void Render(ID3D11DeviceContext*);
 	void Update();
@@ -50,12 +55,16 @@ public:
 	int GetIndexCount();
 	int GetVertexCount();
 	int GetInstanceCount();
+	int m_instanceCount;
 
 	ID3D11ShaderResourceView* GetTexture();
+
+	void SetInstancePosition(D3DXVECTOR3 new_position);
 
 	D3DXMATRIX world_matrix;
 
 
+	std::vector<InstanceType> instanceData_vector;
 private:
 	bool InitializeBuffers(ID3D11Device*);
 	void ShutdownBuffers();
@@ -66,19 +75,20 @@ private:
 
 	bool LoadModel(char*);
 	void ReleaseModel();
+	bool isAgent;
 
 	D3D11_BUFFER_DESC instanceBufferDesc;
 	D3D11_SUBRESOURCE_DATA instanceData;
 	ID3D11Device* my_device;
 	ID3D11Buffer * m_vertexBuffer, *m_indexBuffer;
 	ID3D11Buffer* m_instanceBuffer;
-	int m_vertexCount, m_indexCount, m_instanceCount;
+	int m_vertexCount, m_indexCount;
 
 	TextureClass* m_Texture;
 	ModelType* m_model; // reads and holds the model data, before its placed in vertex buffer
 
-	std::vector<InstanceType> instanceData_vector; // list of all isntances
 	std::vector<Agent*> agents;//list of pointers
+	std::vector<Field*> fields;
 };
 
 #endif

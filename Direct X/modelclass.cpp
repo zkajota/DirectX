@@ -7,6 +7,7 @@
 #include <vector>
 #include <fstream>
 #include <time.h>
+
 using namespace std;
 
 ModelClass::ModelClass()
@@ -16,7 +17,8 @@ ModelClass::ModelClass()
 	m_Texture = 0;
 	m_model = 0;
 	m_instanceBuffer = 0;
-	m_instanceCount = 10;
+	//m_instanceCount = 10;
+	goalL = 0.0f;
 }
 
 
@@ -29,8 +31,11 @@ ModelClass::~ModelClass()
 {
 }
 
-bool ModelClass::Initialize(ID3D11Device* device, char* modelFilename, WCHAR* textureFilename)
+bool ModelClass::Initialize(ID3D11Device* device, char* modelFilename, WCHAR* textureFilename, int _instanceCount, bool _isAgent)
 {
+	isAgent = _isAgent;
+	m_instanceCount = _instanceCount;
+	// = m_instanceCount;
 	bool result;
 
 	// Load in the model data,
@@ -79,14 +84,37 @@ void ModelClass::Render(ID3D11DeviceContext* deviceContext)
 
 void ModelClass::Update()
 {
-	
-	D3DXVECTOR3 goal = D3DXVECTOR3(10,10,10);
-
-	for (int i = 0; i < agents.size(); ++i)
+	//update Agents
+	if (isAgent)
 	{
-		agents[i]->Update(&agents, &goal);
-		D3DXMatrixTranslation(&world_matrix, agents[i]->m_position.x, agents[i]->m_position.y, agents[i]->m_position.z);
+
+		D3DXVECTOR3 goal = D3DXVECTOR3(goalL, 0, 0);
+
+		for (int i = 0; i < agents.size(); ++i)
+		{
+			agents[i]->Update(&agents, &goal);
+			D3DXMatrixTranslation(&world_matrix, agents[i]->m_position.x, agents[i]->m_position.y, agents[i]->m_position.z);
+		}
+		//goalL++;
 	}
+	else if (isAgent == false)
+	{
+		for (int i = 0; i < fields.size(); ++i)
+		{
+			fields[i]->Update(&fields);
+			D3DXMatrixTranslation(&world_matrix, fields[i]->m_position.x, fields[i]->m_position.y, fields[i]->m_position.z);
+		}
+	}
+	//else
+	//{
+	//	int x = 0;
+	//	int y = 0;
+	//	for (int i = 0; i < m_instanceCount; i++)
+	//	{
+	//		x++;
+	//		y++;
+	//	}
+	//}
 }
 
 int ModelClass::GetVertexCount()
@@ -109,6 +137,10 @@ ID3D11ShaderResourceView* ModelClass::GetTexture()
 	return m_Texture->GetTexture();
 }
 
+void ModelClass::SetInstancePosition(D3DXVECTOR3 new_position)
+{
+	instanceData_vector[0].position = new_position;
+}
 
 bool ModelClass::InitializeBuffers(ID3D11Device* device)
 {
@@ -143,8 +175,6 @@ bool ModelClass::InitializeBuffers(ID3D11Device* device)
 
 		indices[i] = i;
 	}
-	
-	
 
 	// Set up the description of the static vertex buffer.
 	vertexBufferDesc.Usage = D3D11_USAGE_DEFAULT;
@@ -197,29 +227,77 @@ bool ModelClass::InitializeBuffers(ID3D11Device* device)
 	instanceData_vector.reserve(m_instanceCount);
 	instanceData_vector.resize(m_instanceCount);
 
-	srand(time(nullptr));
-
-	for (int i = 0; i < m_instanceCount; i++)
+	if (isAgent == false)
 	{
-		float LO = -40.0f;
-		float HI = 40.0f;
-		float r3 = LO + static_cast <float> (rand()) / (static_cast <float> (RAND_MAX / (HI - LO)));
-		float r4 = LO + static_cast <float> (rand()) / (static_cast <float> (RAND_MAX / (HI - LO)));
-		instanceData_vector[i].position = D3DXVECTOR3(r3, r4, 0.0f);
+		int rows = 10;
+		int col = 10;
 
-		Agent * tomek = new Agent;
-		agents.push_back(tomek);
-		tomek->m_position= D3DXVECTOR3(r3, r4, 0.0f);
-		tomek->myPositioninst = &instanceData_vector[i];
-		tomek->id = i;
+		float l = 0;
+		float k = 0;
+		int currentInst = 0;
 
-		LO = -0.02f;
-		HI = 0.02f;
-		r3 = LO + static_cast <float> (rand()) / (static_cast <float> (RAND_MAX / (HI - LO)));
-		r4 = LO + static_cast <float> (rand()) / (static_cast <float> (RAND_MAX / (HI - LO)));
-		tomek->power = D3DXVECTOR3(r3, r4, 0.0f);
-		//generate random accelleration
+		//for (int i = 0; i < rows; i++)
+		//{
+		//	//posvector.x = posvector.x + 0.9f;
+		//	for (int j = 0; j < col; j++)
+		//	{
+		//		D3DXVECTOR3 newPosition = D3DXVECTOR3(l, k, 0.0f);
+		//		instanceData_vector[currentInst].position = newPosition;
+		//		//instanceData_vector[currentInst].position = posvector;
+		//		Field * field = new Field;
+		//		fields.push_back(field);
+		//		field->m_position = newPosition;
+		//		//field->m_position = posvector;
+		//		field->myPositioninst = &instanceData_vector[currentInst];
+		//		l += 3;
+		//		currentInst++;
+		//	}
+		//	l = 2;
+		//	k += 3;
+		//}
+
+		for (int i = 0; i < m_instanceCount; i++)
+		{
+				//D3DXVECTOR3 newPosition = D3DXVECTOR3(l, 0.0, 0.0f);
+				instanceData_vector[i].position = D3DXVECTOR3(0, 0, 0);
+				//instanceData_vector[currentInst].position = posvector;
+				Field * field = new Field;
+				fields.push_back(field);
+				field->m_position = D3DXVECTOR3(0, 0, 0);
+				field->myPositioninst = &instanceData_vector[currentInst];
+				//l++;
+				//currentInst++;
+				//goalL = goalL + 2.0f;
+		}
+
+
 	}
+	srand(time(nullptr));
+	if (isAgent == true)
+	{
+		for (int i = 0; i < m_instanceCount; i++)
+		{
+			float LO = -40.0f;
+			float HI = 40.0f;
+			float r3 = LO + static_cast <float> (rand()) / (static_cast <float> (RAND_MAX / (HI - LO)));
+			float r4 = LO + static_cast <float> (rand()) / (static_cast <float> (RAND_MAX / (HI - LO)));
+			instanceData_vector[i].position = D3DXVECTOR3(r3, r4, 0.0f);
+
+			Agent * tomek = new Agent;
+			agents.push_back(tomek);
+			tomek->m_position = D3DXVECTOR3(r3, r4, 0.0f);
+			tomek->myPositioninst = &instanceData_vector[i];
+			tomek->id = i;
+
+			LO = -0.02f;
+			HI = 0.02f;
+			r3 = LO + static_cast <float> (rand()) / (static_cast <float> (RAND_MAX / (HI - LO)));
+			r4 = LO + static_cast <float> (rand()) / (static_cast <float> (RAND_MAX / (HI - LO)));
+			tomek->power = D3DXVECTOR3(r3, r4, 0.0f);
+			//generate random accelleration
+		}
+	}
+
 
 	// Set up the description of the instance buffer.
 	instanceBufferDesc.Usage = D3D11_USAGE_DEFAULT;

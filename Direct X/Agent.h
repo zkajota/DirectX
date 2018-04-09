@@ -12,7 +12,7 @@ public:
 	void Update(std::vector<Agent*> *agents, D3DXVECTOR3 *_goal);
 	void AddForce(D3DXVECTOR3);
 
-	D3DXVECTOR3 KeepDistance(std::vector<Agent*> *agents);
+	//D3DXVECTOR3 KeepDistance(std::vector<Agent*> *agents);
 
 	Agent();
 	~Agent();

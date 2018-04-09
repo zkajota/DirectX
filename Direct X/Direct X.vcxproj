@@ -166,7 +166,9 @@
     <ClInclude Include="colorshaderclass.h" />
     <ClInclude Include="Cube.h" />
     <ClInclude Include="d3dclass.h" />
+    <ClInclude Include="Field.h" />
     <ClInclude Include="GameObject.h" />
+    <ClInclude Include="GeometryGenerator.h" />
     <ClInclude Include="Graphicsclass.h" />
     <ClInclude Include="Inputclass.h" />
     <ClInclude Include="lightclass.h" />
@@ -184,7 +186,9 @@
     <ClCompile Include="colorshaderclass.cpp" />
     <ClCompile Include="Cube.cpp" />
     <ClCompile Include="d3dclass.cpp" />
+    <ClCompile Include="Field.cpp" />
     <ClCompile Include="GameObject.cpp" />
+    <ClCompile Include="GeometryGenerator.cpp" />
     <ClCompile Include="Graphicsclass.cpp" />
     <ClCompile Include="Inputclass.cpp" />
     <ClCompile Include="lightclass.cpp" />

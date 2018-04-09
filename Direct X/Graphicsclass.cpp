@@ -57,7 +57,7 @@ bool GraphicsClass::Initialize(int screenWidth, int screenHeight, HWND hwnd)
 	}
 
 	// Set the initial position of the camera.
-	m_Camera->SetPosition(0.0f, 0.0f, -150.0f);
+	m_Camera->SetPosition(0.0f, 0.0f, -100.0f);
 
 	// Create the model object.
 	m_Model = new ModelClass;
@@ -70,15 +70,30 @@ bool GraphicsClass::Initialize(int screenWidth, int screenHeight, HWND hwnd)
 	// Initialize the model object.
 	WCHAR texture[] = L"../data/tileFloor.dds";
 	char model[] = "../data/cube.txt";
-	result = m_Model->Initialize(m_D3D->GetDevice(), model, texture);
+	result = m_Model->Initialize(m_D3D->GetDevice(), model, texture, 10, true);
 	if (!result)
 	{
 		MessageBox(hwnd, L"Could not initialize the model object.", L"Error", MB_OK);
 		return false;
 	}
-
-	m_Cube = new Cube;
-	result = m_Cube->Initialise(m_D3D->GetDevice());
+	
+	char model2[] = "../data/cube.txt";
+	WCHAR texture2[] = L"../data/seafloor.dds";
+	int width = 20;
+	int height = 20;
+	for (int x = 0; x < width; x++)
+	{
+		for (int y = 0; y < height; y++)
+		{
+			m_Cube = new ModelClass;
+			result = m_Cube->Initialize(m_D3D->GetDevice(), model2, texture2, 1, false);
+			m_Cube->SetInstancePosition(D3DXVECTOR3(x*2, y*2, 0));
+			m_level.push_back(m_Cube);
+		}
+	}
+	/*m_Cube = new ModelClass;
+	result = m_Cube->Initialize(m_D3D->GetDevice(), model2, texture2, 1, false);
+	m_Cube->SetInstancePosition(D3DXVECTOR3(1, 1, 0));*/
 	if (!result)
 	{
 		MessageBox(hwnd, L"Could not initialize the m_Cube.", L"Error", MB_OK);
@@ -233,17 +248,21 @@ bool GraphicsClass::Render()
 	// Rotate the world matrix by the rotation value so that the triangle will spin.
 	//D3DXMatrixRotationY(&worldMatrix, rotation);
 
-	// Put the model vertex and index buffers on the graphics pipeline to prepare them for drawing.
 
-	m_Cube->Render(m_D3D->GetDeviceContext());
-	result = m_ColorShader->Render(m_D3D->GetDeviceContext(), m_Cube->GetIndexCount(), worldMatrix, viewMatrix, projectionMatrix);
-	if (!result)
+	 //Put the model vertex and index buffers on the graphics pipeline to prepare them for drawing.
+
+	for(auto tile :m_level)
 	{
-		return false;
+		tile->Render(m_D3D->GetDeviceContext());
+		result = m_LightShader->Render(m_D3D->GetDeviceContext(), tile->GetIndexCount(), tile->GetVertexCount(), tile->GetInstanceCount(), tile->world_matrix, viewMatrix, projectionMatrix, tile->GetTexture(), m_Light->GetDirection(), m_Light->GetAmbientColor(), m_Light->GetDiffuseColor());
+		if (!result)
+		{
+			return false;
+		}
 	}
+	
 
 	m_Model->Render(m_D3D->GetDeviceContext());
-	// Render the model using the light shader.
 	result = m_LightShader->Render(m_D3D->GetDeviceContext(), m_Model->GetIndexCount(), m_Model->GetVertexCount(), m_Model->GetInstanceCount(), m_Model->world_matrix, viewMatrix, projectionMatrix, m_Model->GetTexture(), m_Light->GetDirection(), m_Light->GetAmbientColor(), m_Light->GetDiffuseColor());
 	if (!result)
 	{

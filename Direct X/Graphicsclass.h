@@ -54,7 +54,8 @@ private:
 	LightShaderClass* m_LightShader;
 	ColorShaderClass* m_ColorShader;
 	LightClass* m_Light;
-	Cube* m_Cube;
+	ModelClass* m_Cube;
+	std::vector<ModelClass*> m_level;
 };
 
 #endif
