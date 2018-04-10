@@ -9,6 +9,7 @@
 struct InstanceTypeLevel
 {
 	D3DXVECTOR3 position;
+	
 };
 
 class Level
@@ -36,11 +37,16 @@ public:
 	void Shutdown();
 	void Render(ID3D11DeviceContext*);
 	void Update();
+	void SetGoals(D3DXVECTOR3 &_goal);
 
 	int GetIndexCount();
 	int GetVertexCount();
 	int GetInstanceCount();
+	int GetGoalID();
+	D3DXVECTOR3 ReturnGoalPosition();
+
 	int m_instanceCount;
+	int m_goalID;
 
 	ID3D11ShaderResourceView* GetTexture();
 
@@ -48,9 +54,11 @@ public:
 
 	D3DXMATRIX world_matrix;
 
+	std::vector<Field*> GetFields();
 
 	std::vector<InstanceTypeLevel> instanceData_vector;
 private:
+	bool setNewGoal;
 	int width, height;
 	bool InitializeBuffers(ID3D11Device*);
 	void ShutdownBuffers();

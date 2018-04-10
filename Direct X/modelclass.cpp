@@ -74,47 +74,22 @@ void ModelClass::Shutdown()
 	return;
 }
 
-void ModelClass::Render(ID3D11DeviceContext* deviceContext)
+void ModelClass::Render(ID3D11DeviceContext* deviceContext, D3DXVECTOR3 &_goal)
 {
 	// Put the vertex and index buffers on the graphics pipeline to prepare them for drawing.
 	RenderBuffers(deviceContext);
-	Update();
+	Update(_goal);
 	return;
 }
 
-void ModelClass::Update()
+void ModelClass::Update(D3DXVECTOR3 &_goal)
 {
-	//update Agents
-	if (isAgent)
+
+	for (int i = 0; i < agents.size(); ++i)
 	{
-
-		D3DXVECTOR3 goal = D3DXVECTOR3(goalL, 0, 0);
-
-		for (int i = 0; i < agents.size(); ++i)
-		{
-			agents[i]->Update(&agents, &goal);
-			D3DXMatrixTranslation(&world_matrix, agents[i]->m_position.x, agents[i]->m_position.y, agents[i]->m_position.z);
-		}
-		//goalL++;
+		agents[i]->Update(&agents, &_goal);
+		D3DXMatrixTranslation(&world_matrix, agents[i]->m_position.x, agents[i]->m_position.y, agents[i]->m_position.z);
 	}
-	//else if (isAgent == false)
-	//{
-	//	for (int i = 0; i < fields.size(); ++i)
-	//	{
-	//		fields[i]->Update(&fields);
-	//		D3DXMatrixTranslation(&world_matrix, fields[i]->m_position.x, fields[i]->m_position.y, fields[i]->m_position.z);
-	//	}
-	//}
-	//else
-	//{
-	//	int x = 0;
-	//	int y = 0;
-	//	for (int i = 0; i < m_instanceCount; i++)
-	//	{
-	//		x++;
-	//		y++;
-	//	}
-	//}
 }
 
 int ModelClass::GetVertexCount()
@@ -227,49 +202,6 @@ bool ModelClass::InitializeBuffers(ID3D11Device* device)
 	instanceData_vector.reserve(m_instanceCount);
 	instanceData_vector.resize(m_instanceCount);
 
-	//if (isAgent == false)
-	//{
-	//	//int rows = 10;
-	//	//int col = 10;
-
-	//	//float l = 0;
-	//	//float k = 0;
-	//	//int currentInst = 0;
-
-	//	//for (int i = 0; i < rows; i++)
-	//	//{
-	//	//	//posvector.x = posvector.x + 0.9f;
-	//	//	for (int j = 0; j < col; j++)
-	//	//	{
-	//	//		D3DXVECTOR3 newPosition = D3DXVECTOR3(l, k, 0.0f);
-	//	//		instanceData_vector[currentInst].position = newPosition;
-	//	//		//instanceData_vector[currentInst].position = posvector;
-	//	//		Field * field = new Field;
-	//	//		fields.push_back(field);
-	//	//		field->m_position = newPosition;
-	//	//		//field->m_position = posvector;
-	//	//		field->myPositioninst = &instanceData_vector[currentInst];
-	//	//		l += 3;
-	//	//		currentInst++;
-	//	//	}
-	//	//	l = 2;
-	//	//	k += 3;
-	//	//}
-
-	//	//for (int i = 0; i < m_instanceCount; i++)
-	//	//{
-	//	//		//D3DXVECTOR3 newPosition = D3DXVECTOR3(l, 0.0, 0.0f);
-	//	//		instanceData_vector[i].position = D3DXVECTOR3(0, 0, 0);
-	//	//		//instanceData_vector[currentInst].position = posvector;
-	//	//		Field * field = new Field;
-	//	//		fields.push_back(field);
-	//	//		field->m_position = D3DXVECTOR3(0, 0, 0);
-	//	//		field->myPositioninst = &instanceData_vector[currentInst];
-	//	//		//l++;
-	//	//		//currentInst++;
-	//	//		//goalL = goalL + 2.0f;
-	//	//}
-	//}
 	srand(time(nullptr));
 	if (isAgent == true)
 	{
@@ -295,7 +227,6 @@ bool ModelClass::InitializeBuffers(ID3D11Device* device)
 			//generate random accelleration
 		}
 	}
-
 
 	// Set up the description of the instance buffer.
 	instanceBufferDesc.Usage = D3D11_USAGE_DEFAULT;

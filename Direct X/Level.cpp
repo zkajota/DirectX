@@ -1,11 +1,13 @@
 #include "Level.h"
-
+#include <time.h>
 
 
 Level::Level()
 {
 	width = 0;
 	height = 0;
+	m_goalID = 0;
+	setNewGoal = false;
 }
 
 
@@ -18,9 +20,8 @@ bool Level::Initialize(ID3D11Device* device, char* modelFilename, WCHAR* texture
 	width = _width;
 	height = _height;
 	m_instanceCount = _instanceCount;
-	// = m_instanceCount;
 	bool result;
-
+	
 	// Load in the model data,
 	result = LoadModel(modelFilename);
 	if (!result)
@@ -40,7 +41,6 @@ bool Level::Initialize(ID3D11Device* device, char* modelFilename, WCHAR* texture
 	{
 		return false;
 	}
-
 	return true;
 }
 
@@ -67,10 +67,21 @@ void Level::Update()
 {
 	for (int i = 0; i < fields.size(); ++i)
 	{
-		//fields[i]->Update();
-		D3DXMatrixTranslation(&world_matrix, fields[i]->m_position.x, fields[i]->m_position.y, fields[i]->m_position.z);
+		fields[i]->Update(&world_matrix);
 	}
 	// update vector field if new detected;
+}
+
+void Level::SetGoals(D3DXVECTOR3 &_goal)
+{
+	if (setNewGoal == false)
+	{
+		for (int i = 0; i < m_indexCount; i++)
+		{
+			fields[i]->goal = _goal;
+		}
+	}
+	setNewGoal = true;
 }
 
 int Level::GetVertexCount()
@@ -81,6 +92,17 @@ int Level::GetVertexCount()
 int Level::GetInstanceCount()
 {
 	return m_instanceCount;
+}
+
+int Level::GetGoalID()
+{
+	return m_goalID;
+}
+
+D3DXVECTOR3 Level::ReturnGoalPosition()
+{
+	int i = GetGoalID();
+	return fields[i]->myPositioninst->position / 2;
 }
 
 int Level::GetIndexCount()
@@ -178,38 +200,46 @@ bool Level::InitializeBuffers(ID3D11Device* device)
 	instanceData_vector.reserve(m_instanceCount);
 	instanceData_vector.resize(m_instanceCount);
 
-
-	//set up positions of tiles
-	//for (int i = 0; i < m_instanceCount; i++)
-	//{
-	//	//D3DXVECTOR3 newPosition = D3DXVECTOR3(l, 0.0, 0.0f);
-	//	instanceData_vector[i].position = D3DXVECTOR3(0, 0, 0);
-	//	//instanceData_vector[currentInst].position = posvector;
-	//	Field * field = new Field;
-	//	fields.push_back(field);
-	//	field->m_position = D3DXVECTOR3(0, 0, 0);
-	//	field->myPositioninst = &instanceData_vector[i];
-	//}
-
-	//int width = 20;
-	//int height = 20;
+	srand(time(nullptr));
 	int currentObject = 0;
+	bool goalTarget = false;
+
+	//float rowMin = 0;
+	//float rowMax = width;
+	//float row = rowMin + static_cast <float> (rand()) / (static_cast <float> (RAND_MAX / (rowMax - rowMin)));
+	int row, column;
+	row = rand() % width + 0;
+	column = rand() % height + 0;
+
 	for (int x = 0; x < width; x++)
 	{
 		for (int y = 0; y < height; y++)
 		{
-			//m_Cube = new ModelClass;
-			//result = m_Cube->Initialize(m_D3D->GetDevice(), model2, texture2, 1, false);
-			//m_Cube->SetInstancePosition(D3DXVECTOR3(x * 2, y * 2, 0));
-			//m_level.push_back(m_Cube);
+			float LO = 0.0f; float HI = 10.0f;
+			float r3 = LO + static_cast <float> (rand()) / (static_cast <float> (RAND_MAX / (HI - LO)));
 
-			//instanceData_vector[currentObject].position = D3DXVECTOR3(0, 0, 0);
-			//instanceData_vector[currentInst].position = posvector;
 			Field * field = new Field;
 			fields.push_back(field);
-			//field->m_position = D3DXVECTOR3(0, 0, 0);
+			//SetInstancePosition(D3DXVECTOR3(x * 2, y * 2, 0), currentObject);
 			SetInstancePosition(D3DXVECTOR3(x * 2, y * 2, 0), currentObject);
 			field->myPositioninst = &instanceData_vector[currentObject];
+			if (r3 > 8.0f)
+			{
+				field->walkable = true;
+				if (x >= row && y >= column)
+				{
+					if (goalTarget == false)
+					{
+						field->isGoal = true;
+						goalTarget = true;
+						m_goalID = currentObject;
+					}
+				}
+			}
+			else
+			{
+				field->walkable = false;
+			}
 			currentObject++;
 		}
 	}
@@ -236,6 +266,7 @@ bool Level::InitializeBuffers(ID3D11Device* device)
 
 	return true;
 }
+
 
 
 void Level::ShutdownBuffers()
@@ -267,9 +298,6 @@ void Level::ShutdownBuffers()
 
 void Level::RenderBuffers(ID3D11DeviceContext* deviceContext)
 {
-	/*m_instanceBuffer->Release();
-	my_device->CreateBuffer(&instanceBufferDesc, &instanceData, &m_instanceBuffer);*/
-
 	unsigned int strides[2];
 	unsigned int offsets[2];
 	ID3D11Buffer* bufferPointers[2];
@@ -404,19 +432,11 @@ void Level::ReleaseTexture()
 
 void Level::SetInstancePosition(D3DXVECTOR3 new_position, int i)
 {
-	//fields[i]->m_position = new_position;
 	instanceData_vector[i].position = new_position;
 }
-//
-//int width = 20;
-//int height = 20;
-//for (int x = 0; x < width; x++)
-//{
-//	for (int y = 0; y < height; y++)
-//	{
-//		m_Cube = new ModelClass;
-//		result = m_Cube->Initialize(m_D3D->GetDevice(), model2, texture2, 1, false);
-//		m_Cube->SetInstancePosition(D3DXVECTOR3(x * 2, y * 2, 0));
-//		m_level.push_back(m_Cube);
-//	}
-//}
+
+std::vector<Field*> Level::GetFields()
+{
+
+	return fields;
+}

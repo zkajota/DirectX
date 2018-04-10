@@ -10,6 +10,8 @@ class Agent
 public:
 	int id;
 	void Update(std::vector<Agent*> *agents, D3DXVECTOR3 *_goal);
+	D3DXVECTOR3 Separate(std::vector<Agent*>* agents);
+
 	void AddForce(D3DXVECTOR3);
 
 	//D3DXVECTOR3 KeepDistance(std::vector<Agent*> *agents);
@@ -27,6 +29,9 @@ public:
 	InstanceType * myPositioninst;
 	
 private:
+	static float Distance(const D3DXVECTOR3& v1, const D3DXVECTOR3& v2);
+	D3DXVECTOR3 Normalize();
+
 	float speed;
 	float directionX, directionY;
 

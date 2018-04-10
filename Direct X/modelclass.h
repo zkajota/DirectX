@@ -44,13 +44,10 @@ public:
 	ModelClass(const ModelClass&);
 	~ModelClass();
 
-	int xx = 0;
-	int yy = 0;
-
 	bool Initialize(ID3D11Device*, char*, WCHAR*, int _numOfInstances, bool _isAgent);
 	void Shutdown();
-	void Render(ID3D11DeviceContext*);
-	void Update();
+	void Render(ID3D11DeviceContext*, D3DXVECTOR3 &_goal);
+	void Update(D3DXVECTOR3 &_goal);
 
 	int GetIndexCount();
 	int GetVertexCount();

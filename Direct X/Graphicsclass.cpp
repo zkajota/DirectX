@@ -3,6 +3,7 @@
 ////////////////////////////////////////////////////////////////////////////////
 #include "Graphicsclass.h"
 #include <d3dx9math.h>
+#include <vector>
 
 
 GraphicsClass::GraphicsClass()
@@ -34,7 +35,6 @@ bool GraphicsClass::Initialize(int screenWidth, int screenHeight, HWND hwnd)
 {
 	bool result;
 
-
 	// Create the Direct3D object.
 	m_D3D = new D3DClass;
 	if (!m_D3D)
@@ -50,7 +50,6 @@ bool GraphicsClass::Initialize(int screenWidth, int screenHeight, HWND hwnd)
 		return false;
 	}
 
-
 	// Create the camera object.
 	m_Camera = new CameraClass;
 	if (!m_Camera)
@@ -61,57 +60,35 @@ bool GraphicsClass::Initialize(int screenWidth, int screenHeight, HWND hwnd)
 	// Set the initial position of the camera.
 	m_Camera->SetPosition(0.0f, 0.0f, -100.0f);
 
-	// Create the model object.
-	m_Model = new ModelClass;
-	//m_Model = new GameObject;
-	if (!m_Model)
-	{
-		return false;
-	}
-
-	// Initialize the model object.
 	WCHAR texture[] = L"../data/tileFloor.dds";
+	WCHAR texture2[] = L"../data/seafloor.dds";
 	char model[] = "../data/cube.txt";
-	result = m_Model->Initialize(m_D3D->GetDevice(), model, texture, 10, true);
-	if (!result)
-	{
-		MessageBox(hwnd, L"Could not initialize the model object.", L"Error", MB_OK);
-		return false;
-	}
-	
+	char model2[] = "../data/cube2.txt";
+
 	m_level = new Level;
 	if (!m_level)
 	{
 		return false;
 	}
-	char model2[] = "../data/cube.txt";
-	WCHAR texture2[] = L"../data/seafloor.dds";
-	result = m_level->Initialize(m_D3D->GetDevice(), model, texture, 1600, 40, 40);
+	result = m_level->Initialize(m_D3D->GetDevice(), model2, texture, 40000, 200, 200);
 	if (!result)
 	{
 		MessageBox(hwnd, L"znowu cos spierdolilem.", L"Error", MB_OK);
 		return false;
 	}
- 	//int width = 20;
-	//int height = 20;
-	//for (int x = 0; x < width; x++)
-	//{
-	//	for (int y = 0; y < height; y++)
-	//	{
-	//		m_Cube = new ModelClass;
-	//		result = m_Cube->Initialize(m_D3D->GetDevice(), model2, texture2, 1, false);
-	//		m_Cube->SetInstancePosition(D3DXVECTOR3(x*2, y*2, 0));
-	//		m_level.push_back(m_Cube);
-	//	}
-	//}
-	/*m_Cube = new ModelClass;
-	result = m_Cube->Initialize(m_D3D->GetDevice(), model2, texture2, 1, false);
-	m_Cube->SetInstancePosition(D3DXVECTOR3(1, 1, 0));*/
-	//if (!result)
-	//{
-	//	MessageBox(hwnd, L"Could not initialize the m_Cube.", L"Error", MB_OK);
-	//	return false;
-	//}
+
+	m_Model = new ModelClass;
+	if (!m_Model)
+	{
+		return false;
+	}
+
+	result = m_Model->Initialize(m_D3D->GetDevice(), model, texture2, 100, true);
+	if (!result)
+	{
+		MessageBox(hwnd, L"Could not initialize the model object.", L"Error", MB_OK);
+		return false;
+	}
 
 	// Create the light shader object.
 	m_LightShader = new LightShaderClass;
@@ -244,14 +221,8 @@ void GraphicsClass::Update()
 bool GraphicsClass::Render()
 {
 	D3DXMATRIX viewMatrix, projectionMatrix, worldMatrix;
+
 	bool result;
-	bool cube;
-
-	D3DXMATRIX cubeROT, cubeMOVE;
-
-	//D3DXMatrixRotationY(&cubeROT, D3DXToRadian(45.0f));
-	//D3DXMatrixTranslation(&worldMatrix, 10.0f, 2.0f, 1.0f);
-	//D3DXMatrixMultiply(&worldMatrix, &(cubeROT * cubeMOVE));
 	
 	// Clear the buffers to begin the scene.
 	m_D3D->BeginScene(0.0f, 0.0f, 0.0f, 1.0f);
@@ -262,26 +233,12 @@ bool GraphicsClass::Render()
 	// Get the world, view, and projection matrices from the camera and d3d objects.
 	m_Camera->GetViewMatrix(viewMatrix);
 	m_D3D->GetWorldMatrix(worldMatrix);
-	m_D3D->GetProjectionMatrix(projectionMatrix);
+	m_D3D->GetProjectionMatrix(projectionMatrix);	
 
-	// Rotate the world matrix by the rotation value so that the triangle will spin.
-	//D3DXMatrixRotationY(&worldMatrix, rotation);
-
-
-	 //Put the model vertex and index buffers on the graphics pipeline to prepare them for drawing.
-	//m_D3D->GetDeviceContext()
-	//for(auto tile :m_level)
-	//{
-	//	tile->Render(m_D3D->GetDeviceContext());
-	//	result = m_LightShader->Render(m_D3D->GetDeviceContext(), tile->GetIndexCount(), tile->GetVertexCount(), tile->GetInstanceCount(), tile->world_matrix, viewMatrix, projectionMatrix, tile->GetTexture(), m_Light->GetDirection(), m_Light->GetAmbientColor(), m_Light->GetDiffuseColor());
-	//	if (!result)
-	//	{
-	//		return false;
-	//	}
-	//}
-	
-
-	m_Model->Render(m_D3D->GetDeviceContext());
+	//D3DXVECTOR3 goal = D3DXVECTOR3(10, 25, 0);
+	D3DXVECTOR3 goal = m_level->ReturnGoalPosition();
+	m_level->SetGoals(goal);
+	m_Model->Render(m_D3D->GetDeviceContext(), goal);
 	result = m_LightShader->Render(m_D3D->GetDeviceContext(), m_Model->GetIndexCount(), m_Model->GetVertexCount(), m_Model->GetInstanceCount(), m_Model->world_matrix, viewMatrix, projectionMatrix, m_Model->GetTexture(), m_Light->GetDirection(), m_Light->GetAmbientColor(), m_Light->GetDiffuseColor());
 	if (!result)
 	{
